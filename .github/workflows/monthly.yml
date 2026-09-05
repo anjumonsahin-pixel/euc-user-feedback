@@ -1,0 +1,42 @@
+name: Monthly feedback update
+
+on:
+  schedule:
+    # 06:00 UTC on the 1st of each month. Reports the month that just ended.
+    - cron: '0 6 1 * *'
+  workflow_dispatch:   # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write      # allows the workflow to commit the new index.html
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate this month's page
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python build.py
+
+      - name: Commit the updated page
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update feedback page: $(date -u +'%B %Y')"
+            git push
+          fi
