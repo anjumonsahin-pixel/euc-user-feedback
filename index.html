@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Euc monthly user feedback</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:ital,wght@0,400..700;1,400..600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF6EF;
+    --surface:#FFFFFF;
+    --surface-2:#F4EDE4;
+    --ink:#2C2431;
+    --quiet:#746A76;
+    --rule:#EBE1D6;
+    --euc-green:#1E7A54;
+    --tangerine:#FF6B35;
+    --pink:#FF4F8B;
+    --tangerine-ink:#C24A1E;
+    --pink-ink:#C22C68;
+    --au:#D9541E;
+    --uk:#3A49AB;
+    --de:#2F8F5B;
+    --jp:#C63D57;
+    --pilot:#2C6BAD;
+    --kin:#BC3C79;
+    --software:#0E8E90;
+    --compound:#7346BE;
+    --good:#2E9E63;
+    --bad:#D63A4E;
+    --shadow:rgba(40,20,50,.07);
+    --display:"Bricolage Grotesque","Arial Black",system-ui,sans-serif;
+    --body:"Instrument Sans","Helvetica Neue",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#161318;--surface:#201C25;--surface-2:#2A2531;--ink:#F2EEF4;--quiet:#B4A9BE;
+      --rule:#342D3C;--euc-green:#57C08A;--tangerine:#FF7A4A;--pink:#FF6FA0;--tangerine-ink:#FF9E77;--pink-ink:#FF9BC0;
+      --au:#F5844F;--uk:#8C99EA;--de:#5FC792;--jp:#EE7A90;--pilot:#71AAE2;--kin:#ED81B6;
+      --software:#51C9CA;--compound:#B18DEE;--good:#5FC98C;--bad:#F1707C;--shadow:rgba(0,0,0,.5);color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#161318;--surface:#201C25;--surface-2:#2A2531;--ink:#F2EEF4;--quiet:#B4A9BE;
+    --rule:#342D3C;--euc-green:#57C08A;--tangerine:#FF7A4A;--pink:#FF6FA0;--tangerine-ink:#FF9E77;--pink-ink:#FF9BC0;
+    --au:#F5844F;--uk:#8C99EA;--de:#5FC792;--jp:#EE7A90;--pilot:#71AAE2;--kin:#ED81B6;
+    --software:#51C9CA;--compound:#B18DEE;--good:#5FC98C;--bad:#F1707C;--shadow:rgba(0,0,0,.5);color-scheme:dark;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  .shell{display:grid;grid-template-columns:1fr;max-width:1140px;margin:0 auto}
+  @media(min-width:920px){.shell{grid-template-columns:236px minmax(0,1fr)}}
+
+  /* sidebar */
+  .sidebar{background:var(--surface);border-bottom:1px solid var(--rule)}
+  @media(min-width:920px){.sidebar{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;border-bottom:0;border-right:1px solid var(--rule)}}
+  .brandmark{padding:20px 18px 12px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+  .brandmark .leaf{font-family:var(--display);font-weight:800;font-size:17px;line-height:1.1;letter-spacing:-0.02em}
+  .brandmark .leaf b{color:var(--tangerine-ink);font-weight:800}
+  .bm-controls{display:flex;align-items:center;gap:8px}
+  .side-toggle{display:inline-flex;align-items:center;gap:7px;background:var(--surface-2);color:var(--ink);border:1px solid var(--rule);border-radius:9px;padding:7px 11px;font-family:var(--body);font-size:14px;font-weight:600;cursor:pointer}
+  @media(min-width:920px){.side-toggle{display:none}}
+  .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;border:1px solid var(--rule);background:var(--surface-2);color:var(--ink);font-size:16px;line-height:1;padding:0;cursor:pointer}
+  .theme-toggle:hover{border-color:var(--euc-green)}
+  .side-body{padding:0 14px 22px}
+  @media(max-width:919px){
+    .side-body{max-height:0;overflow:hidden;transition:max-height .28s ease}
+    .sidebar.open .side-body{max-height:1400px}
+  }
+  .side-label{font-family:var(--display);font-weight:700;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--quiet);margin:18px 6px 8px}
+  .editions{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px}
+  .editions li{font-size:14px;padding:8px 10px;border-radius:9px;border:1px solid var(--rule);display:flex;flex-direction:column;gap:1px}
+  .editions li.current{border-color:var(--tangerine);background:color-mix(in srgb,var(--tangerine) 12%,var(--surface))}
+  .editions li b{font-family:var(--display);font-weight:700}
+  .editions li span{font-size:12.5px;color:var(--quiet)}
+  nav.jump{display:flex;flex-direction:column;gap:1px}
+  nav.jump a{padding:7px 10px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14.5px}
+  nav.jump a:hover{background:var(--surface-2)}
+
+  /* filter bar (top of page, centered) */
+  .filterbar{margin:22px 0 6px;padding:16px 16px 14px;border:1px solid var(--rule);border-radius:16px;background:var(--surface-2);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+  .fb-groups{display:flex;flex-wrap:wrap;gap:18px 30px;justify-content:center;width:100%}
+  .fb-group{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .fb-label{font-family:var(--display);font-weight:700;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--quiet)}
+  .pills{display:flex;flex-wrap:wrap;gap:6px}
+  .pill{font-family:var(--body);font-size:13px;font-weight:600;cursor:pointer;padding:5px 11px;border-radius:999px;border:1.5px solid var(--rule);background:var(--surface);color:var(--ink);line-height:1.2;display:inline-flex;align-items:center;gap:6px}
+  .pill::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--ac,var(--quiet))}
+  .pill[aria-pressed="true"]{border-color:var(--ac,var(--tangerine));background:color-mix(in srgb,var(--ac,var(--tangerine)) 16%,var(--surface));color:var(--ac,var(--ink))}
+  .fb-foot{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:center}
+  .reset{margin-top:12px;background:none;border:0;color:var(--tangerine-ink);font-family:var(--body);font-size:14px;font-weight:700;cursor:pointer;padding:2px;text-decoration:underline}
+  .filterstate{font-size:12.5px;color:var(--quiet);margin-top:9px}
+
+  /* accents by key: distinct hue per country and per brand */
+  [data-key="jun-au"],[data-keys~="jun-au"]{--ac:var(--au)}
+  [data-key="jun-uk"],[data-keys~="jun-uk"]{--ac:var(--uk)}
+  [data-key="jun-de"],[data-keys~="jun-de"]{--ac:var(--de)}
+  [data-key="jun-jp"],[data-keys~="jun-jp"]{--ac:var(--jp)}
+  [data-key="pilot"],[data-keys~="pilot"]{--ac:var(--pilot)}
+  [data-key="kin"],[data-keys~="kin"]{--ac:var(--kin)}
+  [data-key="software"],[data-keys~="software"]{--ac:var(--software)}
+  [data-key="compound"],[data-keys~="compound"]{--ac:var(--compound)}
+
+  /* main */
+  .page{padding:26px 22px 90px;max-width:820px}
+  @media(min-width:920px){.page{padding:34px 44px 110px}}
+
+  .masthead h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,5.4vw,46px);line-height:1.02;letter-spacing:-0.03em;margin:0 0 6px;text-wrap:balance;color:var(--euc-green)}
+  .byline{font-family:var(--body);font-weight:600;font-size:15px;color:var(--quiet);margin:0 0 12px}
+  .period{font-family:var(--display);font-weight:700;font-size:clamp(19px,3.2vw,26px);letter-spacing:-0.01em;color:var(--tangerine-ink);margin:0 0 12px;display:inline-flex;align-items:center;gap:9px}
+  .period::before{content:"";width:22px;height:3px;border-radius:2px;background:var(--pink)}
+  .meta-row{display:flex;flex-wrap:wrap;gap:8px;color:var(--quiet);font-size:13.5px}
+  .meta-row .m{background:var(--surface-2);border-radius:6px;padding:3px 9px}
+
+  .mark{background:linear-gradient(color-mix(in srgb,var(--pink) 30%,transparent),color-mix(in srgb,var(--pink) 30%,transparent));background-repeat:no-repeat;background-size:100% 0.86em;background-position:0 84%;border-radius:3px;padding:0 .08em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+  section{margin-top:50px;scroll-margin-top:20px}
+  .eyebrow{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tangerine-ink);margin:0 0 8px;display:flex;align-items:center;gap:9px}
+  .eyebrow::before{content:"";width:24px;height:3px;border-radius:2px;background:var(--tangerine)}
+  h2{font-family:var(--display);font-weight:700;font-size:clamp(22px,3.6vw,28px);letter-spacing:-0.015em;margin:0 0 12px;line-height:1.12;text-wrap:balance}
+  p{margin:0 0 15px;max-width:64ch}
+  .lede{font-size:21px;line-height:1.5}
+
+  .verbatim blockquote{font-family:var(--display);font-weight:600;font-size:clamp(23px,5vw,34px);line-height:1.24;letter-spacing:-0.015em;margin:16px 0 12px;text-wrap:balance}
+  .attrib{font-size:14px;color:var(--quiet)}
+
+  /* stat tiles */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:16px}
+  .tile{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:14px 15px 13px;border-top:4px solid var(--ac,var(--tangerine));box-shadow:0 1px 0 var(--shadow)}
+  .tile .who{font-weight:700;font-size:14px;margin-bottom:2px;color:var(--ac,var(--ink))}
+  .tile .score{font-family:var(--display);font-weight:800;font-size:32px;line-height:1;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .tile .score small{font-size:15px;font-weight:600;color:var(--quiet)}
+  .tile .sub{font-size:12.5px;color:var(--quiet);margin-top:5px;font-variant-numeric:tabular-nums}
+
+  /* cards */
+  .grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:16px}
+  @media(min-width:600px){.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .card{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:16px;border-left:5px solid var(--ac,var(--tangerine));box-shadow:0 1px 0 var(--shadow)}
+  .card h4{font-family:var(--display);font-weight:700;font-size:18px;margin:0 0 6px;display:flex;align-items:center;gap:9px}
+  .flag{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ac);background:color-mix(in srgb,var(--ac) 15%,var(--surface));padding:2px 8px;border-radius:999px}
+  .card p{font-size:15.5px;margin:0}
+  .card .nums{font-size:13px;color:var(--quiet);font-variant-numeric:tabular-nums;margin:0 0 8px}
+
+  /* items */
+  .items{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+  .item{background:var(--surface);border:1px solid var(--rule);border-radius:13px;padding:14px 15px;border-left:5px solid var(--ac,var(--tangerine));box-shadow:0 1px 0 var(--shadow)}
+  .item .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;align-items:center}
+  .chip{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;color:var(--quiet);background:var(--surface-2)}
+  .chip.key{color:var(--ac);background:color-mix(in srgb,var(--ac) 15%,var(--surface))}
+  .chip.pos{color:var(--good);background:color-mix(in srgb,var(--good) 15%,var(--surface))}
+  .chip.neg{color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,var(--surface))}
+  .item blockquote{margin:0;font-size:16px;line-height:1.45}
+  .item .src{font-size:13px;color:var(--quiet);margin-top:7px}
+
+  .empty{display:none;font-size:15px;color:var(--quiet);background:var(--surface-2);border:1px dashed var(--rule);border-radius:12px;padding:14px 16px;margin-top:14px}
+  .empty.show{display:block}
+
+  .note{background:var(--surface);border:1px solid var(--rule);border-left:5px solid var(--tangerine);border-radius:14px;padding:16px}
+  .note h4{font-family:var(--display);font-weight:700;margin:0 0 6px;font-size:17px;color:var(--tangerine-ink)}
+  .note p{margin:0;font-size:15.5px}
+
+  footer{margin-top:60px;padding-top:16px;border-top:2px solid var(--rule);font-size:13.5px;color:var(--quiet)}
+  a{color:var(--tangerine-ink)}
+  :focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brandmark">
+      <div class="leaf">Eucalyptus<br><b>user feedback</b></div>
+      <div class="bm-controls">
+        <button class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark mode">🌙</button>
+        <button class="side-toggle" id="sideToggle" aria-expanded="false" aria-controls="sideBody">Menu</button>
+      </div>
+    </div>
+    <div class="side-body" id="sideBody">
+      <div class="side-label">Editions</div>
+      <ul class="editions">
+        <li class="current"><b>Edition 01</b><span>August 2026</span></li>
+      </ul>
+
+      <div class="side-label">In this edition</div>
+      <nav class="jump">
+        <a href="#top">The month in short</a>
+        <a href="#ratings">Ratings at a glance</a>
+        <a href="#watch">One thing to watch</a>
+        <a href="#markets">Juniper by market</a>
+        <a href="#brands">The other brands</a>
+        <a href="#voices">What people said</a>
+        <a href="#clinical">For the clinical team</a>
+      </nav>
+
+      <div class="side-label">Juniper by market</div>
+      <div class="pills" id="marketPills">
+        <button class="pill" data-key="jun-au" aria-pressed="false">Australia</button>
+        <button class="pill" data-key="jun-uk" aria-pressed="false">UK</button>
+        <button class="pill" data-key="jun-de" aria-pressed="false">Germany</button>
+        <button class="pill" data-key="jun-jp" aria-pressed="false">Japan</button>
+      </div>
+
+      <div class="side-label">Other brands</div>
+      <div class="pills" id="brandPills">
+        <button class="pill" data-key="pilot" aria-pressed="false">Pilot</button>
+        <button class="pill" data-key="kin" aria-pressed="false">Kin</button>
+        <button class="pill" data-key="software" aria-pressed="false">Software</button>
+        <button class="pill" data-key="compound" aria-pressed="false">Compound</button>
+      </div>
+      <button class="reset" id="resetBtn">Show everything</button>
+      <p class="filterstate" id="filterState">Showing everything.</p>
+    </div>
+  </aside>
+
+  <main class="page" id="top">
+    <header class="masthead">
+      <h1>Euc monthly user feedback</h1>
+      <div class="byline">Anjumon Sahin</div>
+      <div class="period">August 2026</div>
+      <div class="meta-row">
+        <span class="m">Juniper AU, UK, DE, JP</span>
+        <span class="m">Pilot, Kin, Software, Compound</span>
+      </div>
+    </header>
+
+    <section id="intro">
+      <p class="lede">August was quiet and mostly positive for Juniper, especially in Australia, where people praised their health coaches and how easy the service is. The friction that did show up sat in the app, not the treatment. The clearest example: people in <span class="mark">both Australia and Germany</span> hit the same repeated Bluetooth prompt.</p>
+      <div class="verbatim">
+        <blockquote>The app is easy to navigate with lots of reminders about what's coming up.</blockquote>
+        <p class="attrib">Mim, Australia, Trustpilot, 28 August 2026, 4 stars. A fair summary of the Australian mood this month.</p>
+      </div>
+    </section>
+
+    <section id="ratings">
+      <p class="eyebrow">Ratings at a glance</p>
+      <h2>Where Juniper stands today</h2>
+      <p>The current public review scores for Juniper, running averages across all reviews, not just August.</p>
+      <div class="tiles" id="tiles">
+        <div class="tile filterable" data-keys="jun-au"><div class="who">Juniper AU</div><div class="score">4.5<small>/5</small></div><div class="sub">Trustpilot &middot; 1,952 reviews</div></div>
+        <div class="tile filterable" data-keys="jun-au"><div class="who">Juniper AU</div><div class="score">4.6<small>/5</small></div><div class="sub">App Store &middot; 330 ratings</div></div>
+        <div class="tile filterable" data-keys="jun-uk"><div class="who">Juniper UK</div><div class="score">4.6<small>/5</small></div><div class="sub">App Store &middot; 1.1k ratings</div></div>
+        <div class="tile filterable" data-keys="jun-de"><div class="who">Juniper DE</div><div class="score">2.7<small>/5</small></div><div class="sub">App Store &middot; 34 ratings</div></div>
+        <div class="tile filterable" data-keys="jun-au jun-uk jun-de jun-jp"><div class="who">Juniper</div><div class="score">4.6<small>/5</small></div><div class="sub">Google Play &middot; 393 reviews, 100k+ installs</div></div>
+      </div>
+      <div class="empty" id="tilesEmpty">No Juniper rating matches the current filter. Japan has no public score we could read this month.</div>
+    </section>
+
+    <section id="watch">
+      <p class="eyebrow">One thing to watch</p>
+      <h2>The app keeps asking about Bluetooth</h2>
+      <p>The same complaint turned up in two countries this month. On the Australian App Store one user said the app asks to add Bluetooth devices several times a week. On the German App Store another user raised the same nagging behaviour. It is a small thing on its own, but it is the one issue that crossed markets in August, so it is worth a look from the app team.</p>
+      <div class="items">
+        <div class="item filterable" data-keys="jun-au">
+          <div class="chips"><span class="chip key">Juniper AU</span><span class="chip">App Store</span><span class="chip">27 Aug</span><span class="chip neg">3 stars</span></div>
+          <blockquote>The app is constantly asking for permission to add new Bluetooth devices. Multiple times a week.</blockquote>
+          <p class="src">Grerutin</p>
+        </div>
+        <div class="item filterable" data-keys="jun-de">
+          <div class="chips"><span class="chip key">Juniper DE</span><span class="chip">App Store</span><span class="chip">16 Aug</span><span class="chip neg">2 stars</span></div>
+          <blockquote>Schaltet man aber Bluetooth aus, dann penetriert einen die App.<br><span style="color:var(--quiet);font-size:14px">If you turn Bluetooth off, the app keeps pestering you.</span></blockquote>
+          <p class="src">Kingfunny736 &middot; translated from German</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="markets">
+      <p class="eyebrow">Juniper by market</p>
+      <h2>The same brand, four different pictures</h2>
+      <p>Juniper runs in four countries. Use the market filters in the menu to focus on one. Australia is the strongest, Germany the weakest, and Japan we could not read this month.</p>
+      <div class="grid two">
+        <div class="card filterable" data-keys="jun-au">
+          <h4>Australia <span class="flag">AU</span></h4>
+          <p class="nums">Trustpilot 4.5 &middot; App Store 4.6 &middot; ProductReview 4.4 &middot; Google Play 4.6</p>
+          <p>The busiest and happiest market. August reviews praised the health coaches and the ease of booking and delivery. The two soft spots were price, mentioned in passing even in five star reviews, and getting hold of a person when the app is the first line of help.</p>
+        </div>
+        <div class="card filterable" data-keys="jun-uk">
+          <h4>United Kingdom <span class="flag">UK</span></h4>
+          <p class="nums">App Store 4.6 &middot; reviews.io 3.5</p>
+          <p>Quieter this month. The App Store score is healthy, but the written reviews we could read were older and centred on injection tracking bugs and slow support. We could not read the UK Trustpilot page this month, so treat the UK as lightly covered.</p>
+        </div>
+        <div class="card filterable" data-keys="jun-de">
+          <h4>Germany <span class="flag">DE</span></h4>
+          <p class="nums">App Store 2.7</p>
+          <p>The one market that stands out for the wrong reasons. The German app score is low, and August reviews were about the app itself: the Bluetooth nagging, being asked to update almost daily, and one user who could not log in or even select Germany as their country.</p>
+        </div>
+        <div class="card filterable" data-keys="jun-jp">
+          <h4>Japan <span class="flag">JP</span></h4>
+          <p class="nums">No public score we could read</p>
+          <p>A blank this month. Juniper is newer in Japan and we found no public review page we could read. This is a gap to close, not a sign that Japan is quiet.</p>
+        </div>
+      </div>
+      <div class="empty" id="marketsEmpty">No Juniper market matches the current filter. Try a market chip, or show everything.</div>
+    </section>
+
+    <section id="brands">
+      <p class="eyebrow">The other brands</p>
+      <h2>Pilot, Kin, Software, Compound</h2>
+      <div class="tiles" id="brandTiles">
+        <div class="tile filterable" data-keys="pilot"><div class="who">Pilot</div><div class="score">4.3<small>/5</small></div><div class="sub">ProductReview &middot; 2,004</div></div>
+        <div class="tile filterable" data-keys="kin"><div class="who">Kin</div><div class="score">4.9<small>/5</small></div><div class="sub">ProductReview &middot; 3,285</div></div>
+        <div class="tile filterable" data-keys="software"><div class="who">Software</div><div class="score">4.4<small>/5</small></div><div class="sub">ProductReview &middot; 995</div></div>
+      </div>
+      <p style="margin-top:16px">These four run in Australia only. Nothing from August stood out enough to pull into the main story, so here is where each one sits and its running theme.</p>
+      <div class="grid two">
+        <div class="card filterable" data-keys="pilot">
+          <h4>Pilot <span class="flag">Pilot</span></h4>
+          <p>Steady. The recurring gripe is price against seeing a GP or a pharmacy directly.</p>
+        </div>
+        <div class="card filterable" data-keys="kin">
+          <h4>Kin <span class="flag">Kin</span></h4>
+          <p>The highest rated of the group. The one sour note is people being charged a renewal fee after they thought they had cancelled.</p>
+        </div>
+        <div class="card filterable" data-keys="software">
+          <h4>Software <span class="flag">Software</span></h4>
+          <p>Quiet. The most recent reviews we saw were several months old.</p>
+        </div>
+        <div class="card filterable" data-keys="compound">
+          <h4>Compound <span class="flag">Compound</span></h4>
+          <p>A newer premium product with no public review page yet, so nothing to report.</p>
+        </div>
+      </div>
+      <div class="empty" id="brandsEmpty">No brand matches the current filter. Try a brand chip, or show everything.</div>
+    </section>
+
+    <section id="voices">
+      <p class="eyebrow">What people said</p>
+      <h2>August, in their words</h2>
+      <p>A selection of what people wrote this month, quoted exactly. Filter by market or brand to narrow it down.</p>
+      <div class="items" id="voices-list">
+        <div class="item filterable" data-keys="jun-au">
+          <div class="chips"><span class="chip key">Juniper AU</span><span class="chip">Trustpilot</span><span class="chip">27 Aug</span><span class="chip pos">5 stars</span></div>
+          <blockquote>Product is reliable, but the one aspect that I have given the 5 stars for is the care of my Health Coach Rosie.</blockquote>
+          <p class="src">Tammy</p>
+        </div>
+        <div class="item filterable" data-keys="jun-au">
+          <div class="chips"><span class="chip key">Juniper AU</span><span class="chip">Trustpilot</span><span class="chip">28 Aug</span><span class="chip pos">5 stars</span></div>
+          <blockquote>Easy, fast and friendly service. From booking appointments to delivery. The only thing I would change would be the price.</blockquote>
+          <p class="src">Chantel</p>
+        </div>
+        <div class="item filterable" data-keys="jun-au">
+          <div class="chips"><span class="chip key">Juniper AU</span><span class="chip">ProductReview</span><span class="chip">about mid Aug</span><span class="chip neg">negative</span></div>
+          <blockquote>Really terrible, no one to contact when you need help, just AI chat bot. So disappointed.</blockquote>
+          <p class="src">Jane S &middot; date is approximate, ProductReview shows only "about 3 weeks ago"</p>
+        </div>
+        <div class="item filterable" data-keys="jun-de">
+          <div class="chips"><span class="chip key">Juniper DE</span><span class="chip">App Store</span><span class="chip">29 Aug</span><span class="chip neg">1 star</span></div>
+          <blockquote>Kann nicht mit meinen Daten einloggen, kann nicht Deutschland auswählen.<br><span style="color:var(--quiet);font-size:14px">I can't log in with my details, I can't select Germany.</span></blockquote>
+          <p class="src">XDqw77 &middot; translated from German</p>
+        </div>
+        <div class="item filterable" data-keys="jun-de">
+          <div class="chips"><span class="chip key">Juniper DE</span><span class="chip">App Store</span><span class="chip">20 Aug</span><span class="chip neg">1 star</span></div>
+          <blockquote>Muss man eine App denn wirklich fast t&auml;glich aktualisieren?<br><span style="color:var(--quiet);font-size:14px">Do you really have to update an app almost every day?</span></blockquote>
+          <p class="src">derschoenerene &middot; translated from German</p>
+        </div>
+      </div>
+      <div class="empty" id="voicesEmpty">Nothing to show for this filter. The reviews we could confirm for August were Juniper Australia and Germany. The other markets and brands had no dated August review we could read.</div>
+    </section>
+
+    <section id="clinical">
+      <p class="eyebrow">For the clinical team</p>
+      <div class="note">
+        <h4>Worth a closer look</h4>
+        <p>Nothing new about side effects or safety came up in August. A few older reviews, from the UK App Store late last year and Germany over the summer, mention not being able to log injection doses in the app. That has a medical angle, so it is passed to the clinical team to judge. This page is a heads-up, not the formal safety report.</p>
+      </div>
+    </section>
+
+    <section id="how">
+      <p class="eyebrow">How we read this</p>
+      <h2>Sources, and what we could not get</h2>
+      <p>We read August's public reviews across Trustpilot, the Apple App Store, Google Play, ProductReview and reviews.io. The scores here are real figures, not estimates, and public reviews are a signal, not a full survey.</p>
+      <p>New this month: Google Play, confirmed as the correct Juniper app, 4.6 across 393 reviews. Australian Trustpilot also came through via a mirror of the site. Still missing: UK and Pilot Trustpilot, and Japan, which has no readable source yet. Germany was read in German with translation.</p>
+    </section>
+
+    <footer>
+      Eucalyptus monthly user feedback. August 2026 edition, built from public reviews. Send anything to add or correct to Anjumon.
+    </footer>
+  </main>
+</div>
+
+<script>
+(function(){
+  // theme toggle: default follows the viewer's system theme; once toggled it is remembered
+  var root=document.documentElement;
+  var themeBtn=document.getElementById('themeToggle');
+  function iconFor(isDark){return isDark?'☀️':'🌙';}
+  function systemDark(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;}
+  function currentDark(){var t=root.getAttribute('data-theme');return t?t==='dark':systemDark();}
+  function setTheme(t){
+    root.setAttribute('data-theme',t);
+    themeBtn.textContent=iconFor(t==='dark');
+    try{localStorage.setItem('euc-theme',t);}catch(e){}
+  }
+  var stored=null;try{stored=localStorage.getItem('euc-theme');}catch(e){}
+  if(stored==='dark'||stored==='light'){setTheme(stored);}
+  else{themeBtn.textContent=iconFor(systemDark());}
+  themeBtn.addEventListener('click',function(){setTheme(currentDark()?'light':'dark');});
+
+  var sidebar=document.getElementById('sidebar');
+  var toggle=document.getElementById('sideToggle');
+  toggle.addEventListener('click',function(){
+    var open=sidebar.classList.toggle('open');
+    toggle.setAttribute('aria-expanded',open?'true':'false');
+  });
+  document.querySelectorAll('nav.jump a').forEach(function(a){
+    a.addEventListener('click',function(){
+      if(window.matchMedia('(max-width:919px)').matches){sidebar.classList.remove('open');toggle.setAttribute('aria-expanded','false');}
+    });
+  });
+
+  var active=new Set();
+  var stateEl=document.getElementById('filterState');
+  var labels={'jun-au':'Juniper Australia','jun-uk':'Juniper UK','jun-de':'Juniper Germany','jun-jp':'Juniper Japan','pilot':'Pilot','kin':'Kin','software':'Software','compound':'Compound'};
+
+  function apply(){
+    document.querySelectorAll('.filterable').forEach(function(el){
+      if(active.size===0){el.hidden=false;return;}
+      var keys=(el.getAttribute('data-keys')||'').split(/\s+/);
+      el.hidden=!keys.some(function(k){return active.has(k);});
+    });
+    checkEmpty('#tiles','#tilesEmpty');
+    checkEmpty('#markets .grid','#marketsEmpty');
+    checkEmpty('#brands .grid','#brandsEmpty');
+    checkEmpty('#voices-list','#voicesEmpty');
+    if(active.size===0){stateEl.textContent='Showing everything.';}
+    else{stateEl.textContent='Showing: '+Array.from(active).map(function(k){return labels[k];}).join(', ');}
+  }
+  function checkEmpty(sel,emptyId){
+    var any=false;
+    document.querySelectorAll(sel+' .filterable').forEach(function(el){if(!el.hidden)any=true;});
+    var e=document.querySelector(emptyId);
+    if(e)e.classList.toggle('show',!any);
+  }
+  document.querySelectorAll('.pill').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var k=btn.getAttribute('data-key');
+      if(active.has(k)){active.delete(k);btn.setAttribute('aria-pressed','false');}
+      else{active.add(k);btn.setAttribute('aria-pressed','true');}
+      apply();
+    });
+  });
+  document.getElementById('resetBtn').addEventListener('click',function(){
+    active.clear();
+    document.querySelectorAll('.pill').forEach(function(b){b.setAttribute('aria-pressed','false');});
+    apply();
+  });
+  apply();
+})();
+</script>
+</body>
+</html>
