@@ -40,7 +40,12 @@ Eucalyptus is a digital health company. Its brands are:
 - Software: skin. Australia only.
 - Compound: newer premium product. Australia only.
 
-Your task: use web search to find public user reviews published during {month_name} {year} across Trustpilot, the Apple App Store, Google Play, ProductReview.com.au, and reviews.io. Then produce a single self-contained HTML page reporting what you found, in exactly the layout of the template below.
+Your task: use web search to find public user reviews and discussion published during {month_name} {year} across these sources:
+- Trustpilot, including the UK Trustpilot page for Juniper.
+- The Apple App Store and Google Play.
+- ProductReview.com.au and reviews.io.
+- Reddit: search reddit.com for mentions of Juniper, and check any subreddits where people discuss it, including weight-loss and GLP-1 medication communities and any Juniper-specific threads.
+Then produce a single self-contained HTML page reporting what you found, in exactly the layout of the template below.
 
 Rules for the content:
 - Only include review quotes you can actually find, each with its source and a date (exact or approximate) in {month_name} {year}. Quote them exactly. Never invent reviews, scores, names, or dates.
@@ -49,6 +54,8 @@ Rules for the content:
 - Write in plain, declarative sentences. No em dashes: use commas, colons, or separate sentences. No marketing language.
 - In "One thing to watch", pick the single most notable recurring or cross-market issue if there is one. If nothing stands out, say the month was quiet.
 - Keep the clinical-team note only if something with a medical or safety angle actually appears in a review this month.
+- Reddit posts and comments are not star-rated. Treat them as qualitative signal. Quote them exactly, include the subreddit name and the date, and only use Reddit content that clearly refers to Juniper.
+- Tag every item to the correct market using the data-keys attribute. UK Trustpilot and UK Reddit mentions are Juniper UK (jun-uk). If a Reddit mention does not name a market, give it a data-keys value listing all four Juniper markets so it appears under any Juniper filter.
 
 Rules for the format:
 - Match the template exactly: same CSS, same section structure, same class names, same data-keys filtering attributes, same sidebar, same JavaScript. Change only the content.
